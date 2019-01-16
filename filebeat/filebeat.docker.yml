@@ -1,0 +1,8 @@
+filebeat.prospectors:
+- input_type: log
+  paths:
+  # can also use wildcards, eg. *.log
+    - /Library/EthereumClassic/mainnet/mlogs/geth.log
+  symlinks: true
+output.logstash:
+  hosts: ["logstash:5043"]

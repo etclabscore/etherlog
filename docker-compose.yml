@@ -1,0 +1,87 @@
+version: '2'
+
+services:
+
+  elasticsearch:
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elk
+
+  logstash:
+    build:
+      context: logstash/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ~/Library/EthereumClassic/:/EthereumClassic:ro
+    ports:
+      - "5000:5000"
+      - "9600:9600"
+      - "5043:5043"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    build:
+      context: kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./kibana/config/:/usr/share/kibana/config:ro
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    build:
+      context: filebeat/
+      args:
+        FILEBEAT_VERSION: $FILEBEAT_VERSION
+    command:
+      -c /usr/share/filebeat/filebeat.docker.yml
+    volumes:
+      - ./filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.docker.yml:ro
+      - ~/Library/EthereumClassic/mainnet/mlogs/:/Library/EthereumClassic/mainnet/mlogs/:ro
+    networks:
+      - elk
+    depends_on:
+      - logstash
+
+  geth:
+    build:
+      context: geth/
+      args:
+        GETH_VERSION: $GETH_VERSION
+    command:
+      --mlog="json" --vmodule="eth/fetcher/*=6,eth/downloader/*=6,eth/peer.go=6,eth/handler.go=5,core/database_util.go=6,core/blockchain.go=6" --log-status="sync=10" --rpc --ws --datadir "/Library/EthereumClassic/"
+    volumes:
+      - ~/Library/EthereumClassic/:/Library/EthereumClassic/
+    ports:
+      - "8485:8485"
+    networks:
+      - elk
+    depends_on:
+      - filebeat
+networks:
+
+  elk:
+    driver: bridge
