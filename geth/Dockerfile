@@ -7,8 +7,8 @@ ENV PATH=/usr/lib/go-1.10.2/bin:$PATH
 RUN \
   apt-get update && apt-get upgrade -q -y && \
   apt-get install -y --no-install-recommends git make gcc libc-dev ca-certificates && \
-  go get -d github.com/ethereumproject/go-ethereum/... && \
-  go install github.com/ethereumproject/go-ethereum/cmd/...
+  go get -d github.com/ethereumclassic/go-ethereum/... && \
+  go install github.com/ethereumclassic/go-ethereum/cmd/...
 
 RUN ln -s ./bin/geth geth
 
