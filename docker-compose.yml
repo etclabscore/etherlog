@@ -72,7 +72,7 @@ services:
       args:
         GETH_VERSION: $GETH_VERSION
     command:
-      --mlog="json" --vmodule="eth/fetcher/*=6,eth/downloader/*=6,eth/peer.go=6,eth/handler.go=5,core/database_util.go=6,core/blockchain.go=6" --log-status="sync=10" --rpc --ws --datadir "/Library/EthereumClassic/"
+      --mlog="json" --vmodule="eth/fetcher/*=6,eth/downloader/*=6,eth/peer.go=6,eth/handler.go=5,core/database_util.go=6,core/blockchain.go=6" --log-status="sync=10" --rpc --ws --datadir "/Library/EthereumClassic/" --display-fmt=gitlike
     volumes:
       - ~/Library/EthereumClassic/:/Library/EthereumClassic/
     ports:
