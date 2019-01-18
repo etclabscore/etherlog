@@ -4,5 +4,7 @@ filebeat.prospectors:
   # can also use wildcards, eg. *.log
     - /Library/EthereumClassic/mainnet/mlogs/geth.log
   symlinks: true
+  json.message_key: event
+  json.keys_under_root: true
 output.logstash:
   hosts: ["logstash:5043"]
