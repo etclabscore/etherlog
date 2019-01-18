@@ -1,20 +1,14 @@
-ARG GETH_VERSION
-
-FROM golang:1.10.2
-
-ENV PATH=/usr/lib/go-1.10.2/bin:$PATH
+FROM alpine:3.7
 
 RUN \
-  apt-get update && apt-get upgrade -q -y && \
-  apt-get install -y --no-install-recommends git make gcc libc-dev ca-certificates && \
+  apk add --update go git make gcc musl-dev linux-headers ca-certificates && \
+  export GOPATH=/go && mkdir "$GOPATH" && \
   go get -d github.com/ethereumclassic/go-ethereum/... && \
-  go install github.com/ethereumclassic/go-ethereum/cmd/...
+  (cd "$GOPATH/src/github.com/ethereumclassic/go-ethereum" && env WITH_SVM=0 make cmd/geth) && \
+  cp "$GOPATH"/src/github.com/ethereumclassic/go-ethereum/bin/geth /geth && \
+  apk del go git make gcc musl-dev linux-headers && \
+  rm -rf /go-ethereum && rm -rf /var/cache/apk/*
 
-RUN ln -s ./bin/geth geth
-
-# Utilities
-RUN apt-get install -y curl
-
-EXPOSE 8545 8546 30303 30303/udp
-
-ENTRYPOINT ["./geth"]
+EXPOSE 8545
+EXPOSE 30303
+ENTRYPOINT ["/geth"]
