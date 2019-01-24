@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.17.0 (a74acad)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: logstash
+  name: logstash
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: logstash
+    spec:
+      containers:
+      - env:
+        - name: LS_JAVA_OPTS
+          value: -Xmx256m -Xms256m
+        image: logstash
+        name: logstash
+        ports:
+        - containerPort: 5000
+        - containerPort: 9600
+        - containerPort: 5043
+        resources: {}
+        volumeMounts:
+        - mountPath: /usr/share/logstash/config/logstash.yml
+          name: logstash-claim0
+          readOnly: true
+        - mountPath: /usr/share/logstash/pipeline
+          name: logstash-claim1
+          readOnly: true
+        - mountPath: /EthereumClassic
+          name: logstash-claim2
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: logstash-claim0
+        persistentVolumeClaim:
+          claimName: logstash-claim0
+          readOnly: true
+      - name: logstash-claim1
+        persistentVolumeClaim:
+          claimName: logstash-claim1
+          readOnly: true
+      - name: logstash-claim2
+        persistentVolumeClaim:
+          claimName: logstash-claim2
+          readOnly: true
+status: {}

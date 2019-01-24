@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.17.0 (a74acad)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: geth
+  name: geth
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: geth
+    spec:
+      containers:
+      - args:
+        - --mlog=json
+        - --vmodule=eth/fetcher/*=6,eth/downloader/*=6,eth/peer.go=6,eth/handler.go=5,core/database_util.go=6,core/blockchain.go=6
+        - --log-status=sync=10
+        - --rpc
+        - --ws
+        - --datadir
+        - /Library/EthereumClassic/
+        - --display-fmt=gitlike
+        image: geth
+        name: geth
+        ports:
+        - containerPort: 8485
+        resources: {}
+        volumeMounts:
+        - mountPath: /Library/EthereumClassic/
+          name: geth-claim0
+      restartPolicy: Always
+      volumes:
+      - name: geth-claim0
+        persistentVolumeClaim:
+          claimName: geth-claim0
+status: {}
