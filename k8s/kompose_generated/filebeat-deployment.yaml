@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.17.0 (a74acad)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: filebeat
+  name: filebeat
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: filebeat
+    spec:
+      containers:
+      - args:
+        - -c
+        - /usr/share/filebeat/filebeat.docker.yml
+        image: filebeat
+        name: filebeat
+        resources: {}
+        volumeMounts:
+        - mountPath: /usr/share/filebeat/filebeat.docker.yml
+          name: filebeat-claim0
+          readOnly: true
+        - mountPath: /Library/EthereumClassic/mainnet/mlogs/
+          name: filebeat-claim1
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: filebeat-claim0
+        persistentVolumeClaim:
+          claimName: filebeat-claim0
+          readOnly: true
+      - name: filebeat-claim1
+        persistentVolumeClaim:
+          claimName: filebeat-claim1
+          readOnly: true
+status: {}

@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.17.0 (a74acad)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kibana
+  name: kibana
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: kibana
+    spec:
+      containers:
+      - image: kibana
+        name: kibana
+        ports:
+        - containerPort: 5601
+        resources: {}
+        volumeMounts:
+        - mountPath: /usr/share/kibana/config
+          name: kibana-claim0
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: kibana-claim0
+        persistentVolumeClaim:
+          claimName: kibana-claim0
+          readOnly: true
+status: {}
