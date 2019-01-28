@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: default
+  name: filebeat-template-init
+spec:
+  template:
+    spec:
+      containers:
+      - name: filebeat-template-init
+        image: docker.elastic.co/beats/filebeat:6.5.2
+        command: [ "filebeat", "setup", "--template",
+          "-E", "output.logstash.enabled=false",
+          "-E", 'output.elasticsearch.hosts=["elasticsearch.default.svc.cluster.local:9200"]' ]
+      restartPolicy: Never
+  backoffLimit: 4
