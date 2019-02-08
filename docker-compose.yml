@@ -16,6 +16,9 @@ services:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
       - elk
+    mem_limit: 4000000000
+    memswap_limit: 4000000000
+    mem_reservation: 3gb
 
   logstash:
     build:
@@ -85,3 +88,4 @@ networks:
 
   elk:
     driver: bridge
+
